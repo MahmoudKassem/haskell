@@ -61,13 +61,15 @@ data BinaryTree a = Nil | Node a (BinaryTree a) (BinaryTree a)
 
 instance (Show a) => Show (BinaryTree a) where
    show binaryTree = showBinaryTree binaryTree 0
-       where showBinaryTree Nil _ = "Nil"
-             showBinaryTree (Node value left right) numberOfTabs = "(Node " ++ show value ++ "\n" ++
-                 (addTabs (numberOfTabs + 1)) ++ (showBinaryTree left (numberOfTabs + 2)) ++ "\n" ++
-                 (addTabs (numberOfTabs + 1)) ++ (showBinaryTree right (numberOfTabs + 2)) ++ "\n" ++
-                 (addTabs numberOfTabs) ++ ")"
-                    where addTabs 0 = ""
-                          addTabs numberOfTabs = "\t" ++ addTabs (numberOfTabs - 1)
+       where showBinaryTree binaryTree numberOfTabs = case binaryTree of
+                Nil -> "Nil"
+                (Node value left right) -> "(Node " ++ show value ++ "\n" ++
+                    (addTabs (numberOfTabs + 1)) ++ (showBinaryTree left (numberOfTabs + 2)) ++ "\n" ++
+                    (addTabs (numberOfTabs + 1)) ++ (showBinaryTree right (numberOfTabs + 2)) ++ "\n" ++
+                    (addTabs numberOfTabs) ++ ")"
+                        where addTabs numberOfTabs = if numberOfTabs > 0
+                                                     then "\t" ++ addTabs (numberOfTabs - 1)
+                                                     else ""
 
 countUnivalBinaryTrees :: Eq a => BinaryTree a -> Int
 countUnivalBinaryTrees binaryTree = case binaryTree of
