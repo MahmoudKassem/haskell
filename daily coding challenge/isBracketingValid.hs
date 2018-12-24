@@ -3,17 +3,13 @@ import qualified Data.Maybe as Maybe (fromJust)
 
 main :: IO ()
 main = do
-    let valid1 = isBracketingValid "([])[]({})"
-    Text.printf "%s -> %s\n" "([])[]({})" (show valid1)
+    Text.printf "%s -> %s\n" "([])[]({})" (show $ isBracketingValid "([])[]({})")
 
-    let valid2 = isBracketingValid "([)]"
-    Text.printf "%s -> %s\n" "([)]" (show valid2)
+    Text.printf "%s -> %s\n" "([)]" (show $ isBracketingValid "([)]")
 
-    let valid3 = isBracketingValid "((()"
-    Text.printf "%s -> %s\n" "((()" (show valid3)
+    Text.printf "%s -> %s\n" "((()" (show $ isBracketingValid "((()")
 
-    let valid4 = isBracketingValid ""
-    Text.printf "%s -> %s\n" "" (show valid4)
+    Text.printf "%s -> %s\n" "" (show $ isBracketingValid "")
 
 data Stack a = Empty | Top a (Stack a) deriving (Show, Eq)
 
@@ -38,5 +34,5 @@ isBracketingValid bracketString = isBracketingValid' bracketString Empty
                 | currentBracket == ')' -> previousBracket == '(' && isRestValid
                 | currentBracket == ']' -> previousBracket == '[' && isRestValid
                 | currentBracket == '}' -> previousBracket == '{' && isRestValid
-                    where previousBracket = Maybe.fromJust $ fst $ pop stack
-                          isRestValid = isBracketingValid' rest (snd $ pop stack)
+                where previousBracket = Maybe.fromJust $ fst $ pop stack
+                      isRestValid = isBracketingValid' rest (snd $ pop stack)

@@ -129,15 +129,15 @@ compress list = compress' list []
 
 pack :: Eq a => [a] -> [[a]]
 pack list = pack' list [] []
-    where pack' list consecutiveDuplicatesList packedList = case list of
-            [] -> case consecutiveDuplicatesList of
+    where pack' list packedSublist packedList = case list of
+            [] -> case packedSublist of
                 [] -> packedList
-                otherwise -> (packedList ++ [consecutiveDuplicatesList])
-            (element : rest) -> case consecutiveDuplicatesList of
-                [] -> pack' rest (element : consecutiveDuplicatesList) packedList
+                otherwise -> (packedList ++ [packedSublist])
+            (element : rest) -> case packedSublist of
+                [] -> pack' rest (element : packedSublist) packedList
                 (duplicateElement : _)
-                    | element == duplicateElement -> pack' rest (element : consecutiveDuplicatesList) packedList
-                    | otherwise -> pack' rest [element] (packedList ++ [consecutiveDuplicatesList])
+                    | element == duplicateElement -> pack' rest (element : packedSublist) packedList
+                    | otherwise -> pack' rest [element] (packedList ++ [packedSublist])
 
 encode :: Eq a => [a] -> [(Int, a)]
 encode list = encode' (pack list) []

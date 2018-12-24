@@ -18,8 +18,7 @@ main = do
                             Nil
                             Nil)))
 
-    let count1 = countUnivalBinaryTrees tree1
-    Text.printf "%s -> %s\n\n" (show tree1) (show count1)
+    Text.printf "%s -> %s\n\n" (show tree1) (show $ countUnivalBinaryTrees tree1)
 
     let tree2 = (Node 1
                     (Node 1
@@ -37,8 +36,7 @@ main = do
                             Nil
                             Nil)))
 
-    let count2 = countUnivalBinaryTrees tree2
-    Text.printf "%s -> %s\n\n" (show tree2) (show count2)
+    Text.printf "%s -> %s\n\n" (show tree2) (show $ countUnivalBinaryTrees tree2)
 
     let tree3 = (Node 1
                     (Node 1
@@ -54,8 +52,7 @@ main = do
                             Nil
                             Nil)))
 
-    let count3 = countUnivalBinaryTrees tree3
-    Text.printf "%s -> %s\n\n" (show tree3) (show count3)
+    Text.printf "%s -> %s\n\n" (show tree3) (show $ countUnivalBinaryTrees tree3)
 
 data BinaryTree a = Nil | Node a (BinaryTree a) (BinaryTree a)
 
@@ -67,9 +64,10 @@ instance (Show a) => Show (BinaryTree a) where
                     (addTabs (numberOfTabs + 1)) ++ (showBinaryTree left (numberOfTabs + 2)) ++ "\n" ++
                     (addTabs (numberOfTabs + 1)) ++ (showBinaryTree right (numberOfTabs + 2)) ++ "\n" ++
                     (addTabs numberOfTabs) ++ ")"
-                        where addTabs numberOfTabs = if numberOfTabs > 0
-                                                     then "\t" ++ addTabs (numberOfTabs - 1)
-                                                     else ""
+                    where addTabs numberOfTabs =
+                            if numberOfTabs > 0
+                            then "\t" ++ addTabs (numberOfTabs - 1)
+                            else ""
 
 countUnivalBinaryTrees :: Eq a => BinaryTree a -> Int
 countUnivalBinaryTrees binaryTree = case binaryTree of

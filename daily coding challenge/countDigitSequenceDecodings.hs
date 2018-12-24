@@ -3,14 +3,11 @@ import qualified Text.Printf as Text (printf)
 -- encoding : a -> 1, b -> 2, ... , z -> 26
 main :: IO ()
 main = do
-    let count1 = countDigitSequenceDecodings "111" -- aaa, ak, ka
-    Text.printf "%s -> %s\n" "111" (show count1)
+    Text.printf "%s -> %s\n" "111" (show $ countDigitSequenceDecodings "111") -- aaa, ak, ka
 
-    let count2 = countDigitSequenceDecodings "1234" -- abcd, lcd, awd
-    Text.printf "%s -> %s\n" "1234" (show count2)
+    Text.printf "%s -> %s\n" "1234" (show  $ countDigitSequenceDecodings "1234") -- abcd, lcd, awd
 
-    let count3 = countDigitSequenceDecodings "102" -- jb
-    Text.printf "%s -> %s\n" "102" (show count3)
+    Text.printf "%s -> %s\n" "102" (show $ countDigitSequenceDecodings "102") -- jb
 
 countDigitSequenceDecodings :: String -> Int
 countDigitSequenceDecodings code = case code of
