@@ -145,3 +145,4 @@ encode list = encode' (pack list) []
             [] -> encodedList
             (packedSublist : packedRest) -> case packedSublist of
                 (subListElement : _) -> encode' packedRest (encodedList ++ [(myLength packedSublist, subListElement)])
+                [] -> encode' packedRest encodedList
