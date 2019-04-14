@@ -121,11 +121,11 @@ myFlatten nestedList = case nestedList of
 compress :: Eq a => [a] -> [a]
 compress list = compress' list []
     where compress' list compressedList = case list of
-            [] -> compressedList
-            [element] -> (compressedList ++ [element])
+            [] -> myReverse compressedList
+            [element] -> myReverse (element : compressedList)
             (element : nextElement : rest)
                 | element == nextElement -> compress' (nextElement : rest) compressedList
-                | otherwise -> compress' (nextElement : rest) (compressedList ++ [element])
+                | otherwise -> compress' (nextElement : rest) (element : compressedList)
 
 pack :: Eq a => [a] -> [[a]]
 pack list = pack' list [] []
