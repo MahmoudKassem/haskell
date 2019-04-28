@@ -111,8 +111,7 @@ encodeDirect list = encodeDirect' list []
                 if runLength > 1
                 then encodeDirect' reducedRest (encodedList ++ [Pair(runLength, element)])
                 else encodeDirect' rest (encodedList ++ [Element element])
-                where runLength = fst $ countAndRemoveConsecutiveDuplicates element 1 rest
-                      reducedRest = snd $ countAndRemoveConsecutiveDuplicates element 1 rest
+                where (runLength, reducedRest) = countAndRemoveConsecutiveDuplicates element 1 rest
                       countAndRemoveConsecutiveDuplicates element runLength subList = case subList of
                           [] -> (runLength, subList)
                           (subElement : rest) ->
@@ -123,39 +122,39 @@ encodeDirect list = encodeDirect' list []
 dupli :: [a] -> [a]
 dupli list = dupli' list []
     where dupli' list duplicatedList = case list of
-            [] -> duplicatedList
-            (element : rest) -> dupli' rest (duplicatedList ++ [element, element])
+            [] -> reverse duplicatedList
+            (element : rest) -> dupli' rest (element : element : duplicatedList)
 
 repli :: [a] -> Int -> [a]
 repli list numberOfReplications = repli' list numberOfReplications []
     where repli' list numberOfReplications replicatedList = case list of
             [] -> replicatedList
             (element : rest) ->
-                repli' rest numberOfReplications (replicatedList ++ (repeatElement numberOfReplications element ))
+                repli' rest numberOfReplications (replicatedList ++ (repeatElement numberOfReplications element))
 
 myDrop :: [a] -> Int -> [a]
 myDrop list number = myDrop' list number 1 []
         where myDrop' list number count reducedList = case list of
-                [] -> reducedList
+                [] -> reverse reducedList
                 (element : rest)
                     | count == number -> myDrop' rest number 1 reducedList
-                    | otherwise -> myDrop' rest number (count + 1) (reducedList ++ [element])
+                    | otherwise -> myDrop' rest number (count + 1) (element : reducedList)
 
 split :: [a] -> Int -> ([a], [a])
 split list lengthOfFirstPart = split' list lengthOfFirstPart 0 ([], [])
     where split' list lengthOfFirstPart index (firstPart, secondPart) = case list of
-            [] -> (firstPart, secondPart)
+            [] -> (reverse firstPart, reverse secondPart)
             (element : rest)
-                | index < lengthOfFirstPart -> split' rest lengthOfFirstPart (index + 1) ((firstPart ++ [element]), secondPart)
-                | otherwise -> split' rest lengthOfFirstPart (index + 1) (firstPart, (secondPart ++ [element]))
+                | index < lengthOfFirstPart -> split' rest lengthOfFirstPart (index + 1) (element : firstPart, secondPart)
+                | otherwise -> split' rest lengthOfFirstPart (index + 1) (firstPart, element : secondPart)
 
 slice :: [a] -> Int -> Int -> [a]
 slice list lowerBound higherBound = slice' list lowerBound higherBound 1 []
     where slice' list lowerBound higherBound index slicedList = case list of
-            [] -> slicedList
+            [] -> reverse slicedList
             (element : rest) ->
                 if index >= lowerBound && index <= higherBound
-                then slice' rest lowerBound higherBound (index + 1) (slicedList ++ [element])
+                then slice' rest lowerBound higherBound (index + 1) (element : slicedList)
                 else slice' rest lowerBound higherBound (index + 1) slicedList
 
 rotate :: Eq a => [a] -> Int -> [a]
@@ -167,7 +166,7 @@ rotate list positions
 removeAt :: [a] -> Int -> ([a], Maybe a)
 removeAt list position = removeAt' list position 1 []
     where removeAt' list position index resultList = case list of
-            [] -> (resultList, Nothing)
+            [] -> (reverse resultList, Nothing)
             (element : rest)
                 | position == index -> ((resultList ++ rest), Just element)
-                | otherwise -> removeAt' rest position (index + 1) (resultList ++ [element])
+                | otherwise -> removeAt' rest position (index + 1) (element : resultList)
