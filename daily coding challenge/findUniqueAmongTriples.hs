@@ -13,7 +13,8 @@ main = do
 
 findUniqueAmongTriples :: [Int.Int32] -> Int.Int32
 findUniqueAmongTriples list = findUniqueAmongTriples' list 0 0
-    where findUniqueAmongTriples' _ 31 uniqueElement
+    where findUniqueAmongTriples' :: [Int.Int32] -> Int -> Int.Int32 -> Int.Int32
+          findUniqueAmongTriples' _ 31 uniqueElement
             | uniqueElement Bits..&. 1 `Bits.shiftL` 30 > 0 = uniqueElement + 2 ^ 31
             | otherwise = uniqueElement
           findUniqueAmongTriples' list bitPosition uniqueElement =
@@ -21,6 +22,7 @@ findUniqueAmongTriples list = findUniqueAmongTriples' list 0 0
               then findUniqueAmongTriples' list (bitPosition + 1) (uniqueElement Bits..|. oneAtBitPosition)
               else findUniqueAmongTriples' list (bitPosition + 1) uniqueElement
               where oneAtBitPosition = 1 `Bits.shiftL` bitPosition
+                    countOnesAtBitPosition :: [Int.Int32] -> Int -> Int.Int32 -> Int.Int32
                     countOnesAtBitPosition [] _ onesCount = onesCount
                     countOnesAtBitPosition (element : rest) bitPosition onesCount =
                         if element Bits..&. oneAtBitPosition > 0

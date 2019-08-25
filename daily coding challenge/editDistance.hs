@@ -10,7 +10,8 @@ main = do
 
 editDistance :: String -> String -> Int
 editDistance string1 string2 = editDistance' string1 string2 0
-    where editDistance' string1 string2 distance
+    where editDistance' :: String -> String -> Int -> Int
+          editDistance' string1 string2 distance
             | string1 == "" = distance + length string2
             | string2 == "" = distance + length string1
             | otherwise =

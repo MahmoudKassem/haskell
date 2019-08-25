@@ -63,7 +63,8 @@ main = do
 
 pack :: Eq a => [a] -> [[a]]
 pack list = pack' list [] []
-    where pack' list packedSublist packedList = case list of
+    where pack' :: Eq a => [a] -> [a] -> [[a]] -> [[a]]
+          pack' list packedSublist packedList = case list of
             [] -> case packedSublist of
                 [] -> packedList
                 otherwise -> (packedList ++ [packedSublist])
@@ -76,12 +77,13 @@ pack list = pack' list [] []
 data EncodedElement a = Element a | Pair (Int, a)
 
 instance (Show a) => Show (EncodedElement a) where
-   show (Element element) = show element
-   show (Pair (length, element)) = "(" ++ show length ++ ", " ++ show element ++ ")"
+  show (Element element) = show element
+  show (Pair (length, element)) = "(" ++ show length ++ ", " ++ show element ++ ")"
 
 encodeModified :: Eq a => [a] -> [EncodedElement a]
 encodeModified list = encodeModified' (pack list) []
-    where encodeModified' packedList encodedList = case packedList of
+    where encodeModified' :: Eq a => [[a]] -> [EncodedElement a] -> [EncodedElement a]
+          encodeModified' packedList encodedList = case packedList of
             [] -> encodedList
             (packedSublist : packedRest) -> case packedSublist of
                 (subListElement : _) ->
@@ -91,13 +93,15 @@ encodeModified list = encodeModified' (pack list) []
 
 repeatElement :: Int -> a -> [a]
 repeatElement numberOfReplications element = repeatElement' numberOfReplications element []
-        where repeatElement' numberOfReplications element listWithRepitions
+        where repeatElement' :: Int -> a -> [a] -> [a]
+              repeatElement' numberOfReplications element listWithRepitions
                 | numberOfReplications <= 0 = listWithRepitions
                 | otherwise = repeatElement' (numberOfReplications - 1) element (element : listWithRepitions)
 
 decodeModified :: [EncodedElement a] -> [a]
 decodeModified encodedList = decodeModified' encodedList []
-    where decodeModified' encodedList decodedList = case encodedList of
+    where decodeModified' :: [EncodedElement a] -> [a] -> [a]
+          decodeModified' encodedList decodedList = case encodedList of
             [] -> decodedList
             (Element element : encodedRest) -> decodeModified' encodedRest (decodedList ++ [element])
             (Pair (numberOfReplications, element) : encodedRest) ->
@@ -105,13 +109,15 @@ decodeModified encodedList = decodeModified' encodedList []
 
 encodeDirect :: Eq a => [a] -> [EncodedElement a]
 encodeDirect list = encodeDirect' list []
-    where encodeDirect' list encodedList = case list of
+    where encodeDirect' :: Eq a => [a] -> [EncodedElement a] -> [EncodedElement a]
+          encodeDirect' list encodedList = case list of
             [] -> encodedList
             (element : rest) ->
                 if runLength > 1
                 then encodeDirect' reducedRest (encodedList ++ [Pair(runLength, element)])
                 else encodeDirect' rest (encodedList ++ [Element element])
                 where (runLength, reducedRest) = countAndRemoveConsecutiveDuplicates element 1 rest
+                      countAndRemoveConsecutiveDuplicates :: Eq a => a -> Int -> [a] -> (Int, [a])
                       countAndRemoveConsecutiveDuplicates element runLength subList = case subList of
                           [] -> (runLength, subList)
                           (subElement : rest) ->
@@ -121,20 +127,23 @@ encodeDirect list = encodeDirect' list []
 
 dupli :: [a] -> [a]
 dupli list = dupli' list []
-    where dupli' list duplicatedList = case list of
+    where dupli' :: [a] -> [a] -> [a]
+          dupli' list duplicatedList = case list of
             [] -> reverse duplicatedList
             (element : rest) -> dupli' rest (element : element : duplicatedList)
 
 repli :: [a] -> Int -> [a]
 repli list numberOfReplications = repli' list numberOfReplications []
-    where repli' list numberOfReplications replicatedList = case list of
+    where repli' :: [a] -> Int -> [a] -> [a]
+          repli' list numberOfReplications replicatedList = case list of
             [] -> replicatedList
             (element : rest) ->
                 repli' rest numberOfReplications (replicatedList ++ (repeatElement numberOfReplications element))
 
 myDrop :: [a] -> Int -> [a]
 myDrop list number = myDrop' list number 1 []
-        where myDrop' list number count reducedList = case list of
+        where myDrop' :: [a] -> Int -> Int -> [a] -> [a]
+              myDrop' list number count reducedList = case list of
                 [] -> reverse reducedList
                 (element : rest)
                     | count == number -> myDrop' rest number 1 reducedList
@@ -142,7 +151,8 @@ myDrop list number = myDrop' list number 1 []
 
 split :: [a] -> Int -> ([a], [a])
 split list lengthOfFirstPart = split' list lengthOfFirstPart 0 ([], [])
-    where split' list lengthOfFirstPart index (firstPart, secondPart) = case list of
+    where split' :: [a] -> Int -> Int -> ([a], [a]) -> ([a], [a])
+          split' list lengthOfFirstPart index (firstPart, secondPart) = case list of
             [] -> (reverse firstPart, reverse secondPart)
             (element : rest)
                 | index < lengthOfFirstPart -> split' rest lengthOfFirstPart (index + 1) (element : firstPart, secondPart)
@@ -150,7 +160,8 @@ split list lengthOfFirstPart = split' list lengthOfFirstPart 0 ([], [])
 
 slice :: [a] -> Int -> Int -> [a]
 slice list lowerBound higherBound = slice' list lowerBound higherBound 1 []
-    where slice' list lowerBound higherBound index slicedList = case list of
+    where slice' :: [a] -> Int -> Int -> Int -> [a] -> [a]
+          slice' list lowerBound higherBound index slicedList = case list of
             [] -> reverse slicedList
             (element : rest) ->
                 if index >= lowerBound && index <= higherBound
@@ -165,7 +176,8 @@ rotate list positions
 
 removeAt :: [a] -> Int -> ([a], Maybe a)
 removeAt list position = removeAt' list position 1 []
-    where removeAt' list position index resultList = case list of
+    where removeAt' :: [a] -> Int -> Int -> [a] -> ([a], Maybe a)
+          removeAt' list position index resultList = case list of
             [] -> (reverse resultList, Nothing)
             (element : rest)
                 | position == index -> ((resultList ++ rest), Just element)

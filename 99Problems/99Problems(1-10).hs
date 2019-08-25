@@ -97,13 +97,15 @@ elementAt list position =
 
 myLength :: [a] -> Int
 myLength list = myLength' list 0
-    where myLength' list listLength = case list of
+    where myLength' :: [a] -> Int -> Int
+          myLength' list listLength = case list of
             [] -> listLength
             (_ : rest) -> myLength' rest (1 + listLength)
 
 myReverse :: [a] -> [a]
 myReverse list = myReverse' list []
-    where myReverse' list reversedList = case list of
+    where myReverse' :: [a] -> [a] -> [a]
+          myReverse' list reversedList = case list of
             [] -> reversedList
             (element : rest) -> myReverse' rest (element : reversedList)
 
@@ -120,7 +122,8 @@ myFlatten nestedList = case nestedList of
 
 compress :: Eq a => [a] -> [a]
 compress list = compress' list []
-    where compress' list compressedList = case list of
+    where compress' :: Eq a => [a] -> [a] -> [a]
+          compress' list compressedList = case list of
             [] -> myReverse compressedList
             [element] -> myReverse (element : compressedList)
             (element : nextElement : rest)
@@ -129,7 +132,8 @@ compress list = compress' list []
 
 pack :: Eq a => [a] -> [[a]]
 pack list = pack' list [] []
-    where pack' list packedSublist packedList = case list of
+    where pack' :: Eq a => [a] -> [a] -> [[a]] -> [[a]]
+          pack' list packedSublist packedList = case list of
             [] -> case packedSublist of
                 [] -> packedList
                 otherwise -> (packedList ++ [packedSublist])
@@ -141,7 +145,8 @@ pack list = pack' list [] []
 
 encode :: Eq a => [a] -> [(Int, a)]
 encode list = encode' (pack list) []
-    where encode' packedList encodedList = case packedList of
+    where encode' :: Eq a => [[a]] -> [(Int, a)] -> [(Int, a)]
+          encode' packedList encodedList = case packedList of
             [] -> encodedList
             (packedSublist : packedRest) -> case packedSublist of
                 (subListElement : _) -> encode' packedRest (encodedList ++ [(myLength packedSublist, subListElement)])

@@ -25,14 +25,15 @@ pop stack = case stack of
 
 isBracketingValid :: String -> Bool
 isBracketingValid bracketString = isBracketingValid' bracketString Empty
-    where isBracketingValid' bracketString stack = case bracketString of
+    where isBracketingValid' :: String -> Stack Char -> Bool
+          isBracketingValid' bracketString stack = case bracketString of
             [] -> stack == Empty
             (currentBracket : rest)
                 | currentBracket == '(' ||
                   currentBracket == '[' ||
-                  currentBracket == '{' -> isBracketingValid' rest (push currentBracket stack)
+                  currentBracket == '{' -> isBracketingValid' rest $ push currentBracket stack
                 | currentBracket == ')' -> previousBracket == '(' && isRestValid
                 | currentBracket == ']' -> previousBracket == '[' && isRestValid
                 | currentBracket == '}' -> previousBracket == '{' && isRestValid
                 where previousBracket = Maybe.fromJust $ fst $ pop stack
-                      isRestValid = isBracketingValid' rest (snd $ pop stack)
+                      isRestValid = isBracketingValid' rest $ snd $ pop stack
