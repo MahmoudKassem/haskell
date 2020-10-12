@@ -16,7 +16,7 @@ data Stack a = Empty | Top a (Stack a) deriving (Show, Eq)
 push :: a -> Stack a -> Stack a
 push element stack = case stack of
     Empty -> Top element Empty
-    otherwise -> Top element stack
+    (Top top stack) -> Top top (Top element stack)
 
 pop :: Stack a -> (Maybe a, Stack a)
 pop stack = case stack of
