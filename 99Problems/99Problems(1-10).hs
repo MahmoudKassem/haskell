@@ -9,8 +9,8 @@ main = do
     let list4 = [1]
     let list5 = [1, 3, 1]
     let list6 = ['a', 'b', 'c', 'c', 'b', 'a']
-    let list7 = (List [Element 1, Element 2, (List [Element 3, (List [Element 4, Element 5])]), Element 6])
-    let list8 = (List [Element 'a', Element 'b', (List [Element 'c', (List [Element 'd', Element 'e'])]), Element 'f'])
+    let list7 = List [Element 1, Element 2, List [Element 3, List [Element 4, Element 5]], Element 6]
+    let list8 = List [Element 'a', Element 'b', List [Element 'c', List [Element 'd', Element 'e']], Element 'f']
     let list9 = ['a', 'a', 'a', 'a', 'b', 'c', 'c', 'a', 'a', 'd', 'e', 'e', 'e', 'e']
     let list10 = [1, 1, 1, 1, 2, 3, 3, 1, 1, 4, 5, 5, 5, 5]
 
@@ -86,12 +86,12 @@ lastButOne list = case list of
     (_ : rest) -> lastButOne rest
 
 elementAt :: [a] -> Int -> Maybe a
-elementAt list position =
-    if position < 1 then Nothing
-    else if position == 1 then case list of
+elementAt list position
+    | position < 1 = Nothing
+    | position == 1 = case list of
         [] -> Nothing
         (element : _) -> Just element
-    else case list of
+    | otherwise = case list of
         [] -> Nothing
         (_ : rest) -> elementAt rest (position - 1)
 
@@ -136,7 +136,7 @@ pack list = pack' list [] []
           pack' list packedSublist packedList = case list of
             [] -> case packedSublist of
                 [] -> packedList
-                otherwise -> (packedList ++ [packedSublist])
+                _ -> packedList ++ [packedSublist]
             (element : rest) -> case packedSublist of
                 [] -> pack' rest (element : packedSublist) packedList
                 (duplicateElement : _)

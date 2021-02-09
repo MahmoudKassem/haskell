@@ -15,6 +15,6 @@ editDistance string1 string2 = editDistance' string1 string2 0
             | string1 == "" = distance + length string2
             | string2 == "" = distance + length string1
             | otherwise =
-                if (head string1) /= (head string2)
+                if head string1 /= head string2
                 then editDistance' (tail string1) (tail string2) (distance + 1)
                 else editDistance' (tail string1) (tail string2) distance

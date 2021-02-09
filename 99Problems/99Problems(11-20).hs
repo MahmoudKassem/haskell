@@ -67,7 +67,7 @@ pack list = pack' list [] []
           pack' list packedSublist packedList = case list of
             [] -> case packedSublist of
                 [] -> packedList
-                otherwise -> (packedList ++ [packedSublist])
+                _ -> packedList ++ [packedSublist]
             (element : rest) -> case packedSublist of
                 [] -> pack' rest (element : packedSublist) packedList
                 (duplicateElement : _)
@@ -105,7 +105,7 @@ decodeModified encodedList = decodeModified' encodedList []
             [] -> decodedList
             (Element element : encodedRest) -> decodeModified' encodedRest (decodedList ++ [element])
             (Pair (numberOfReplications, element) : encodedRest) ->
-                decodeModified' encodedRest (decodedList ++ (repeatElement numberOfReplications element ))
+                decodeModified' encodedRest (decodedList ++ repeatElement numberOfReplications element)
 
 encodeDirect :: Eq a => [a] -> [EncodedElement a]
 encodeDirect list = encodeDirect' list []
@@ -138,7 +138,7 @@ repli list numberOfReplications = repli' list numberOfReplications []
           repli' list numberOfReplications replicatedList = case list of
             [] -> replicatedList
             (element : rest) ->
-                repli' rest numberOfReplications (replicatedList ++ (repeatElement numberOfReplications element))
+                repli' rest numberOfReplications (replicatedList ++ repeatElement numberOfReplications element)
 
 myDrop :: [a] -> Int -> [a]
 myDrop list number = myDrop' list number 1 []
@@ -170,9 +170,9 @@ slice list lowerBound higherBound = slice' list lowerBound higherBound 1 []
 
 rotate :: Eq a => [a] -> Int -> [a]
 rotate list positions
-    | positions == 0 || list == [] = list
-    | positions > 0 = (snd $ split list positions) ++ (fst $ split list positions)
-    | otherwise = (snd $ split list (length list + positions)) ++ (fst $ split list (length list + positions))
+    | positions == 0 || null list = list
+    | positions > 0 = snd (split list positions) ++ fst (split list positions)
+    | otherwise = snd (split list (length list + positions)) ++ fst (split list (length list + positions))
 
 removeAt :: [a] -> Int -> ([a], Maybe a)
 removeAt list position = removeAt' list position 1 []
@@ -180,5 +180,5 @@ removeAt list position = removeAt' list position 1 []
           removeAt' list position index resultList = case list of
             [] -> (reverse resultList, Nothing)
             (element : rest)
-                | position == index -> ((resultList ++ rest), Just element)
+                | position == index -> (resultList ++ rest, Just element)
                 | otherwise -> removeAt' rest position (index + 1) (element : resultList)

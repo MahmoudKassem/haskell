@@ -20,21 +20,21 @@ main = do
 
     putStrLn "#23 extract a given number of randomly selected elements from a list"
     result <- randomSelection list1 3
-    Text.printf "%s, %s -> %s\n" (show list1) (show 3) (show $ result)
+    Text.printf "%s, %s -> %s\n" (show list1) (show 3) (show result)
     result <- randomSelection list2 3
-    Text.printf "%s, %s -> %s\n" (show list2) (show 3) (show $ result)
+    Text.printf "%s, %s -> %s\n" (show list2) (show 3) (show result)
     result <- randomSelection list3 3
-    Text.printf "%s, %s -> %s\n\n" (show list3) (show 3) (show $ result)
+    Text.printf "%s, %s -> %s\n\n" (show list3) (show 3) (show result)
 
     putStrLn "#24 draw N different random numbers from the set 1..M"
     result <- lotto 6 49
     Text.printf "%s, %s -> %s\n" (show 6) (show 49) (show result)
     result <- lotto 0 49
-    Text.printf "%s, %s -> %s\n" (show 0) (show 49) (show $ result)
+    Text.printf "%s, %s -> %s\n" (show 0) (show 49) (show result)
     result <- lotto 6 0
-    Text.printf "%s, %s -> %s\n" (show 6) (show 0) (show $ result)
+    Text.printf "%s, %s -> %s\n" (show 6) (show 0) (show result)
     result <- lotto 49 6
-    Text.printf "%s, %s -> %s\n\n" (show 49) (show 6) (show $ result)
+    Text.printf "%s, %s -> %s\n\n" (show 49) (show 6) (show result)
 
     putStrLn "#25 generate a random permutation of the elements of a list"
     result <- randomPermutation list1
@@ -64,15 +64,15 @@ removeAt list position = removeAt' list position 1 []
     where removeAt' list position index resultList = case list of
             [] -> (resultList, Nothing)
             (element : rest)
-                | position == index -> ((resultList ++ rest), Just element)
+                | position == index -> (resultList ++ rest, Just element)
                 | otherwise -> removeAt' rest position (index + 1) (resultList ++ [element])
 
 randomSelection :: [a] -> Int -> IO [a]
 randomSelection list numberOfElements
-    | length list == 0 || numberOfElements <= 0 = return []
+    | null list || numberOfElements <= 0 = return []
     | otherwise = do
         randomNumber <- Random.randomRIO (1, length list)
-        let randomElement = (Maybe.fromJust $ snd $ removeAt list randomNumber)
+        let randomElement = Maybe.fromJust $ snd $ removeAt list randomNumber
         resultList <- randomSelection (fst $ removeAt list randomNumber) (numberOfElements - 1)
         return (randomElement : resultList)
 
