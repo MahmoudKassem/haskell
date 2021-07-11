@@ -161,6 +161,12 @@ main = do
     result <- randomPermutation list3
     Text.printf "%s -> %s\n\n" (show list3) (show result)
 
+    putStrLn "#26 generate the combinations of K distinct objects chosen from the N elements of a list"
+    Text.printf "%s, %s -> %s\n" (show list1) (show 3) (show $ combinations list1 3)
+    Text.printf "%s, %s -> %s\n" (show list2) (show 3) (show $ combinations list2 3)
+    Text.printf "%s, %s -> %s\n" (show list3) (show 3) (show $ combinations list3 3)
+    Text.printf "%s, %s -> %s\n" (show list1) (show 0) (show $ combinations list1 0)
+
 data NestedList a = Element a | List [NestedList a] deriving Show
 
 data Encoded a = Once a | Replicated (Int, a)
@@ -355,20 +361,31 @@ range minimum maximum = range' minimum maximum []
               | otherwise = reverse_ range
 
 randomSelection :: [a] -> Int -> IO [a]
-randomSelection list amount = randomSelection' list amount $ length_ list
+randomSelection list draws = randomSelection' list draws $ length_ list
     where randomSelection' :: [a] -> Int -> Int -> IO [a]
-          randomSelection' list amount length
-              | amount <= 0 || null list = return []
+          randomSelection' list draws length
+              | draws <= 0 || null list = return []
               | otherwise = do
                   randomNumber <- Random.randomRIO (1, length)
                   let randomElement = Maybe.fromJust $ snd $ removeAt list randomNumber
-                  selection <- randomSelection' (fst $ removeAt list randomNumber) (amount - 1) (length - 1)
+                  selection <- randomSelection' (fst $ removeAt list randomNumber) (draws - 1) (length - 1)
                   return (randomElement : selection)
 
 lotto :: Int -> Int -> IO [Int]
-lotto amount maximum
-    | maximum < amount || maximum <= 0 = return []
-    | otherwise = randomSelection (range 1 maximum) amount
+lotto draws maximum
+    | maximum < draws || maximum <= 0 = return []
+    | otherwise = randomSelection (range 1 maximum) draws
 
 randomPermutation :: [a] -> IO [a]
 randomPermutation list = randomSelection list $ length_ list
+
+combinations :: [a] -> Int -> [[a]]
+combinations list draws = case list of
+    [] -> [[]]
+    (head : tail)
+        | draws <= 0 -> [[]]
+        | otherwise -> withHead ++ withoutHead
+            where withHead = [ head : combination | combination <- combinations tail (draws - 1) ]
+                  withoutHead
+                      | draws <= length_ tail = combinations tail draws 
+                      | otherwise = []
