@@ -385,7 +385,7 @@ combinations list draws = case list of
     (head : tail)
         | draws <= 0 -> [[]]
         | otherwise -> withHead ++ withoutHead
-            where withHead = [ head : combination | combination <- combinations tail (draws - 1) ]
+            where withHead = [head : combination | combination <- combinations tail (draws - 1)]
                   withoutHead
                       | draws <= length_ tail = combinations tail draws 
                       | otherwise = []
