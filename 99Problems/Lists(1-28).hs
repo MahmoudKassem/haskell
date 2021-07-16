@@ -9,12 +9,13 @@ main = do
     let list2 = ['a', 'b', 'c', 'd']
     let list3 = [] :: [Integer]
     let list4 = [1]
-    let list5 = [1, 3, 1]
+    let list5 = [1, 2, 1]
     let list6 = ['a', 'b', 'c', 'c', 'b', 'a']
     let list7 = List [Element 1, Element 2, List [Element 3, List [Element 4, Element 5]], Element 6]
     let list8 = List [Element 'a', Element 'b', List [Element 'c', List [Element 'd', Element 'e']], Element 'f']
     let list9 = ['a', 'a', 'a', 'a', 'b', 'c', 'c', 'a', 'a', 'd', 'e', 'e', 'e', 'e']
     let list10 = [1, 1, 1, 1, 2, 3, 3, 1, 1, 4, 5, 5, 5, 5]
+    let list11 = [2, 0, 2]
 
     putStrLn "#1 last element of a list"
     Text.printf "%s -> %s\n" (show list1) (show $ Maybe.fromJust $ last_ list1)
@@ -165,7 +166,12 @@ main = do
     Text.printf "%s, %s -> %s\n" (show list1) (show 3) (show $ combinations list1 3)
     Text.printf "%s, %s -> %s\n" (show list2) (show 3) (show $ combinations list2 3)
     Text.printf "%s, %s -> %s\n" (show list3) (show 3) (show $ combinations list3 3)
-    Text.printf "%s, %s -> %s\n" (show list1) (show 0) (show $ combinations list1 0)
+    Text.printf "%s, %s -> %s\n\n" (show list1) (show 0) (show $ combinations list1 0)
+
+    putStrLn "#27 group the elements of a set into disjoint subsets"
+    Text.printf "%s, %s -> %s\n" (show list1) (show list11) (show $ groups list1 list11)
+    Text.printf "%s, %s -> %s\n" (show list2) (show list11) (show $ groups list2 list11)
+    Text.printf "%s, %s -> %s\n" (show list3) (show list11) (show $ groups list3 list11)
 
 data NestedList a = Element a | List [NestedList a] deriving Show
 
@@ -191,7 +197,7 @@ lastButOne list = case list of
 elementAt :: [a] -> Int -> Maybe a
 elementAt list position = case list of
     [] -> Nothing
-    (head : tail) 
+    (head : tail)
         | position < 1 -> Nothing
         | position == 1 -> Just head
         | otherwise -> elementAt tail (position - 1)
@@ -247,7 +253,7 @@ encode list = encode' (pack list) []
     where encode' :: Eq a => [[a]] -> [(Int, a)] -> [(Int, a)]
           encode' packed encoded = case packed of
               [] -> reverse_ encoded
-              (subList@(head : _) : tail) -> encode' tail ((length_ subList, head) : encoded) 
+              (subList@(head : _) : tail) -> encode' tail ((length_ subList, head) : encoded)
 
 encodeModified :: Eq a => [a] -> [Encoded a]
 encodeModified list = encodeModified' (pack list) []
@@ -279,12 +285,12 @@ encodeDirect list = encodeDirect' list []
             (head : tail)
                 | replications > 1 -> encodeDirect' reduced (Replicated (replications, head) : encoded)
                 | otherwise -> encodeDirect' tail (Once head : encoded)
-                where (replications, reduced) = removeReplications head tail 1 
+                where (replications, reduced) = removeReplications head tail 1
                       removeReplications :: Eq a => a -> [a] -> Int -> (Int, [a])
                       removeReplications current list replications = case list of
                           [] -> (replications, list)
                           (head : tail)
-                              | current == head -> removeReplications current tail (replications + 1) 
+                              | current == head -> removeReplications current tail (replications + 1)
                               | otherwise -> (replications, list)
 
 dupli :: [a] -> [a]
@@ -343,10 +349,10 @@ removeAt list position = removeAt' list position 1 [] Nothing
               (head : tail)
                   | index == position -> removeAt' tail position (index + 1) reduced (Just head)
                   | otherwise -> removeAt' tail position (index + 1) (head : reduced) removed
-  
+
 insertAt :: [a] -> a -> Int -> [a]
 insertAt list value position = insertAt' list value position 1 []
-    where insertAt' :: [a] -> a -> Int -> Int -> [a] -> [a]  
+    where insertAt' :: [a] -> a -> Int -> Int -> [a] -> [a]
           insertAt' list value position index increased = case list of
               [] -> reverse_ increased
               (head : tail)
@@ -380,12 +386,27 @@ randomPermutation :: [a] -> IO [a]
 randomPermutation list = randomSelection list $ length_ list
 
 combinations :: [a] -> Int -> [[a]]
-combinations list draws = case list of
-    [] -> [[]]
-    (head : tail)
-        | draws <= 0 -> [[]]
-        | otherwise -> withHead ++ withoutHead
+combinations list draws
+    | draws <= 0 = [[]]
+    | otherwise = case list of
+        [] -> []
+        (head : tail) -> withHead ++ withoutHead
             where withHead = [head : combination | combination <- combinations tail (draws - 1)]
-                  withoutHead
-                      | draws <= length_ tail = combinations tail draws 
-                      | otherwise = []
+                  withoutHead = combinations tail draws
+
+groups :: Eq a => [a] -> [Int] -> [[[a]]]
+groups list sizes = case sizes of
+    [] -> [[]]
+    (head : tail) -> [combination : group | combination <- combinations list head, group <- groups (difference list combination) tail]
+        where difference :: Eq a => [a] -> [a] -> [a]
+              difference list1 list2 = difference' list1 list2 []
+                  where difference' :: Eq a => [a] -> [a] -> [a] -> [a]
+                        difference' list1 list2 difference = case list1 of
+                            [] -> reverse_ difference
+                            (head : tail)
+                                | not $ isElement list2 head -> difference' tail list2 (head : difference)
+                                | otherwise -> difference' tail list2 difference
+                                    where isElement :: Eq a => [a] -> a -> Bool
+                                          isElement list element = case list of
+                                              [] -> False
+                                              (head : tail) -> element == head || isElement tail element
