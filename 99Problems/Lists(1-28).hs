@@ -16,6 +16,9 @@ main = do
     let list9 = ['a', 'a', 'a', 'a', 'b', 'c', 'c', 'a', 'a', 'd', 'e', 'e', 'e', 'e']
     let list10 = [1, 1, 1, 1, 2, 3, 3, 1, 1, 4, 5, 5, 5, 5]
     let list11 = [2, 0, 2]
+    let list12 = [[1, 2, 3], [4, 5], [6, 7, 8], [4, 5], [9, 10, 11, 12], [13, 14], [15]]
+    let list13 = [['a', 'b', 'c'], ['d', 'e'], ['f', 'g', 'h'], ['d', 'e'], ['i', 'j', 'k', 'l'], ['m', 'n'], ['o']]
+    let list14 = [] :: [[Integer]]
 
     putStrLn "#1 last element of a list"
     Text.printf "%s -> %s\n" (show list1) (show $ Maybe.fromJust $ last_ list1)
@@ -171,7 +174,15 @@ main = do
     putStrLn "#27 group the elements of a set into disjoint subsets"
     Text.printf "%s, %s -> %s\n" (show list1) (show list11) (show $ groups list1 list11)
     Text.printf "%s, %s -> %s\n" (show list2) (show list11) (show $ groups list2 list11)
-    Text.printf "%s, %s -> %s\n" (show list3) (show list11) (show $ groups list3 list11)
+    Text.printf "%s, %s -> %s\n\n" (show list3) (show list11) (show $ groups list3 list11)
+
+    putStrLn "#28 sorting a list of lists according to length of sublists"
+    Text.printf "%s -> %s\n" (show list12) (show $ lsort list12)
+    Text.printf "%s -> %s\n" (show list13) (show $ lsort list13)
+    Text.printf "%s -> %s\n\n" (show list14) (show $ lsort list14)
+    Text.printf "%s -> %s\n" (show list12) (show $ lfsort list12)
+    Text.printf "%s -> %s\n" (show list13) (show $ lfsort list13)
+    Text.printf "%s -> %s\n" (show list14) (show $ lfsort list14)
 
 data NestedList a = Element a | List [NestedList a] deriving Show
 
@@ -410,3 +421,51 @@ groups list sizes = case sizes of
                                           isElement list element = case list of
                                               [] -> False
                                               (head : tail) -> element == head || isElement tail element
+
+pivot :: (a -> a -> Bool) -> a -> [a] -> ([a], [a])
+pivot sortBy_ pivot list = (less, greaterOrEqual)
+    where less = reverse_ $ fst $ pivot' sortBy_ pivot list [] []
+          greaterOrEqual = reverse_ $ snd $ pivot' sortBy_ pivot list [] []
+          pivot' :: (a -> a -> Bool) -> a -> [a] -> [a] -> [a] -> ([a], [a])
+          pivot' sortBy_ pivot list less greaterOrEqual = case list of
+              [] -> (less, greaterOrEqual)
+              (head : tail)
+                  | sortBy_ head pivot -> pivot' sortBy_ pivot tail (head : less) greaterOrEqual
+                  | otherwise -> pivot' sortBy_ pivot tail less (head : greaterOrEqual)
+
+sortBy :: (a -> a -> Bool) -> [a] -> [a]
+sortBy sortBy_ list = reverse_ $ sortBy' sortBy_ list []
+    where sortBy' :: (a -> a -> Bool) -> [a] -> [a] -> [a]
+          sortBy' sortBy_ list sorted = case list of
+              [] -> sorted
+              (head : tail) -> sortBy' sortBy_ greaterOrEqual (head : sortBy' sortBy_ less sorted)
+                  where less = fst $ pivot sortBy_ head tail
+                        greaterOrEqual = snd $ pivot sortBy_ head tail
+
+lsort :: [[a]] -> [[a]]
+lsort list = case list of
+    [] -> []
+    _ -> sortBy (\a b -> length_ a < length_ b) list
+
+group :: (a -> a -> Bool) -> a -> [a] -> ([a], [a])
+group groupBy_ key list = group' groupBy_ key list [key] []
+    where group' :: (a -> a -> Bool) -> a -> [a] -> [a] -> [a] -> ([a], [a])
+          group' groupBy_ key list group rest = case list of
+              [] -> (reverse_ group, reverse_ rest)
+              (head : tail)
+                  | groupBy_ key head -> group' groupBy_ key tail (head : group) rest
+                  | otherwise -> group' groupBy_ key tail group (head : rest)
+
+groupBy :: (a -> a -> Bool) -> [a] -> [[a]]
+groupBy groupBy_ list = groupBy' groupBy_ list []
+    where groupBy' :: (a -> a -> Bool) -> [a] -> [[a]] -> [[a]]
+          groupBy' groupBy_ list grouped = case list of
+              [] -> reverse_ grouped
+              (head : tail) -> groupBy' groupBy_ rest (group_ : grouped)
+                  where group_ = fst $ group groupBy_ head tail
+                        rest = snd $ group groupBy_ head tail
+
+lfsort :: [[a]] -> [[a]]
+lfsort list = case list of
+    [] -> []
+    _ -> [group | sortedGroups <- lsort $ groupBy (\a b -> length_ a == length_ b) list, group <- sortedGroups]
