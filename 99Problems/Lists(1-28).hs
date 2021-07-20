@@ -292,17 +292,17 @@ encodeDirect :: Eq a => [a] -> [Encoded a]
 encodeDirect list = encodeDirect' list []
     where encodeDirect' :: Eq a => [a] -> [Encoded a] -> [Encoded a]
           encodeDirect' list encoded = case list of
-            [] -> reverse_ encoded
-            (head : tail)
-                | replications > 1 -> encodeDirect' reduced (Replicated (replications, head) : encoded)
-                | otherwise -> encodeDirect' tail (Once head : encoded)
-                where (replications, reduced) = removeReplications head tail 1
-                      removeReplications :: Eq a => a -> [a] -> Int -> (Int, [a])
-                      removeReplications current list replications = case list of
-                          [] -> (replications, list)
-                          (head : tail)
-                              | current == head -> removeReplications current tail (replications + 1)
-                              | otherwise -> (replications, list)
+              [] -> reverse_ encoded
+              (head : tail)
+                  | replications > 1 -> encodeDirect' reduced (Replicated (replications, head) : encoded)
+                  | otherwise -> encodeDirect' tail (Once head : encoded)
+                      where (replications, reduced) = removeReplications head tail 1
+                            removeReplications :: Eq a => a -> [a] -> Int -> (Int, [a])
+                            removeReplications current list replications = case list of
+                                [] -> (replications, list)
+                                (head : tail)
+                                    | current == head -> removeReplications current tail (replications + 1)
+                                    | otherwise -> (replications, list)
 
 dupli :: [a] -> [a]
 dupli list = dupli' list []
