@@ -90,7 +90,7 @@ primeFactorsMult number = primeFactorsMult' (primeFactors number) []
 
 primesList :: Int -> Int -> [Int]
 primesList start end
-    | start < 2 || end < 2 || start > end = []
+    | start < 2 && end < 2 || start > end = []
     | otherwise = [prime | prime <- [start .. end], isPrime prime]
 
 goldbach :: Int -> (Int, Int)
