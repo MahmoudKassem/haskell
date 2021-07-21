@@ -95,13 +95,14 @@ primesList start end
 
 goldbach :: Int -> (Int, Int)
 goldbach number
-    | number < 3 || odd number = (0, 0)
+    | number < 4 || odd number = (0, 0)
     | otherwise = head [(a, b) | a <- primesList 2 number, b <- primesList 2 number, a + b == number]
 
 goldbachList :: Int -> Int -> [(Int, Int, Int)]
 goldbachList start end
-    | start < 3 || end < 3 || start > end = []
-    | otherwise = [(number, fst $ goldbach number, snd $ goldbach number) | number <- [start .. end], even number]
+    | start < 4 && end < 4 || start > end = []
+    | end == 4 = [(4, 2, 2)]
+    | otherwise = [(number, fst $ goldbach number, snd $ goldbach number) | number <- [start, start + 2 .. end]]
 
 greatestCommonDivisor :: Int -> Int -> Int
 greatestCommonDivisor a b
